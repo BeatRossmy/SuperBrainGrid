@@ -79,6 +79,10 @@ clock.transport.start = function ()
       function ()
         while true do
           for _,d in pairs(midi_slots) do d.device:clock() end
+          -- IF DISTING -> CLOCK TO DISTING
+          if crow_connected then
+            crow.ii.disting.midi(0xF8,0,0)
+          end
           clock.sync(1/24)
         end
       end
@@ -92,6 +96,10 @@ clock.transport.start = function ()
       local d = st-t - 1/48 -- between 24PPQ pulse
       clock.sleep(clock.get_beat_sec()*d)
       for _,d in pairs(midi_slots) do d.device:start() end
+      -- IF DISTING -> CLOCK TO DISTING
+      if crow_connected then
+        crow.ii.disting.midi(0xFA,0,0)
+      end
     end
   )
 end
@@ -102,6 +110,10 @@ clock.transport.stop = function ()
   
   if main_clock then
     for _,d in pairs(midi_slots) do d.device:stop() end
+    -- IF DISTING -> CLOCK TO DISTING
+    --if crow_connected then
+    --  crow.ii.disting.midi(0xFC)
+    --end
   end
 end
 
@@ -129,6 +141,7 @@ Brain = function (g)
       
       self.grid:all(0)
       self.grid:refresh()
+      
       self.grid.key = function (x,y,z) self:key(x,y,z) end
       
       self.grid_handler.grid_event = function (e) self:grid_event(e) end
@@ -144,7 +157,7 @@ Brain = function (g)
       self.overlay.time = util.time()+(duration and duration or 2)
     end,
     
-    draw_help = function (info)
+    --[[draw_help = function (info)
       local x_off = 1
       local y_off = 20
       local w = 4
@@ -165,7 +178,7 @@ Brain = function (g)
       i = info[highlight]
       
       info:draw(MENU_ENC,x_off,y_off,w)
-    end,
+    end,--]]
     
     redraw_screen = function (self)
       screen.move(8,60)
@@ -173,11 +186,11 @@ Brain = function (g)
       screen.level(self.help and 15 or 2)
       screen.text("help")
       
-      local info = Docu[self.tracks[self.focus].engine.name]
+      --[[local info = Docu[self.tracks[self.focus].engine.name]
       if self.help and info then
         self.draw_help(info)
         return
-      end
+      end--]]
       
       -- OUT
       screen.line_width(1)
@@ -328,7 +341,6 @@ Brain = function (g)
         end
       end
       
-      
       -- OLD STUFF IS BELOW HERE
       if true then return end
       
@@ -339,7 +351,6 @@ Brain = function (g)
           if e.type=="press" or e.type=="double" then
             self:play_stop()
           end
-            --
             
         -- PRESETS
         elseif e.y==3 then
@@ -367,7 +378,6 @@ Brain = function (g)
           -- ADAPTED TO NEW LPX INDICES --
           -- ========================== --
           
-        
         -- ENGINE SIDE BUTTONS
         if e.x==9 and (e.y<5) and self.ui_mode=="apps" then
           sel_tr.engine:grid_event(e)
@@ -388,7 +398,7 @@ Brain = function (g)
           elseif self.ui_mode=="presets" and e.y<9 then
             local pre_nr = (e.y-1)*8+e.x
             
-            if USE_GRID128 then
+            --[[if USE_GRID128 then
               if self.preset_mode == "save" then
                 self:save_preset(pre_nr)
                 self:set_overlay("save "..pre_nr, "")
@@ -406,7 +416,7 @@ Brain = function (g)
                 print("save to",pre_nr)
                 self:save_preset(pre_nr)
               end
-            end
+            end--]]
           end
         end
       end,
