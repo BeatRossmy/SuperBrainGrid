@@ -17,7 +17,7 @@
 -- ~  4 track looper
 -- =  4 
 
-hs = include('/awake/lib/halfsecond')
+hs = include('lib/misc/delay')
 
  -- LOAD STUFF
 Buffer = require 'gridbuf'
@@ -42,11 +42,11 @@ add_engine_params = function ()
   params:add_separator()
   params:add_group("engine",5)
   
-  cs_PW = controlspec.new(0,100,'lin',0,50,'%')
+  cs_PW = controlspec.new(0,100,'lin',0,48,'%')
   params:add{type="control",id="pw",controlspec=cs_PW,
     action=function(x) engine.pw(x/100) end}
 
-  cs_REL = controlspec.new(0.1,3.2,'lin',0,1.2,'s')
+  cs_REL = controlspec.new(0.1,3.2,'lin',0,0.8,'s')
   params:add{type="control",id="release",controlspec=cs_REL,
     action=function(x) engine.release(x) end}
 
@@ -61,6 +61,8 @@ add_engine_params = function ()
   cs_PAN = controlspec.new(-1,1, 'lin',0,0,'')
   params:add{type="control",id="pan",controlspec=cs_PAN,
     action=function(x) engine.pan(x) end}
+  
+  params:bang()
 end
 
 include('lib/brain')
@@ -76,6 +78,10 @@ function init()
   end
   
   add_engine_params()
+  
+  hs.init()
+  
+  params:bang()
 
   setup_device_slots()
   
@@ -104,8 +110,6 @@ function init()
   end
   
   clock.run(function () while true do redraw() clock.sleep(1/24) end end)
-  
-  hs.init()
 end
 
 function key(n,z)

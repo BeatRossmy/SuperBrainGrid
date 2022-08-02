@@ -90,7 +90,7 @@ local Targets = {
     channels={1},
     init = function ()
       -- all notes off : 123
-      crow.ii.disting.midi(0xB0,123)
+      crow.ii.disting.midi(0xB0,123,0) --crow.ii.disting.midi(0xB0,123)
     end,
     note_on = function (self,note,vel,ch)
       vel = math.floor(util.clamp(vel*100,1,127))
@@ -148,7 +148,11 @@ Poly_Fork = {
         t = Poly_Fork.targets[t]
         if t==self.target.type then return end
         self.target = Targets[t]()
-        if self.target.init then self.target.init() end
+        if self.target.init then
+          print("polyfork target init")  
+          self.target.init()
+          print("polyfork after target init")  
+        end
         
         self.channels = {}
         if self.target.channels then
